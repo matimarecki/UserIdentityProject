@@ -1,0 +1,165 @@
+@using System.IO
+@model UserIdentityProject.Areas.FileExplorerUser.Models.FileExplorerUserModel
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+<style>
+
+.drag-area {
+    border: 2px solid #888;
+    background: #5a6268;
+    min-width: 50%;
+    min-height: 400px;
+}
+</style>
+
+@{
+    int currId = Model.TheFolders.CurrParentFolder;
+}
+<div class="card-header" style="text-align: center">
+    @* <button id="modalBtn" class="btn btn-primary">Show Modal</button> *@
+    @* <div id="myModal" class="modal"> *@
+    @*     <div class="modal-content"> *@
+    @*         <span class="close">&target;</span> *@
+    @*     </div> *@
+    @* </div> *@
+    @* <form method="post" enctype="multipart/form-data" asp-area="FileExplorerUser" asp-controller="Home" asp-action="Upload"> *@
+    @*     <input type="number" hidden value="@currId" name="fatherId"/> *@
+    @*     <input type="file" name="fileInput" required/> *@
+    @*     <button type="submit" class="btn btn-primary">New File</button> *@
+    @* </form> *@
+</div>
+<div class="card-header">
+    <div class="row">
+        <div class="col-6 card">
+            <div class="card-body" style="overflow-x: auto; overflow-y: hidden">
+                :/@if (Model.TheFolders.PathFolderList.Count > 0) {
+                      foreach (var pathFolder in Model.TheFolders.PathFolderList) {
+                          <a asp-area="FileExplorerUser" asp-controller="Home" asp-action="Index"
+                             asp-route-currId="@pathFolder.Id">@pathFolder.FolderName</a> <a>/</a>
+                      }
+                  }
+            </div>
+        </div>
+        <div class="col-1" style="text-align: center; font-size: 20px">
+            <a asp-area="FileExplorerUser" asp-controller="Home" asp-action="Index">H</a>
+        </div>
+        <div class="col-1" style="text-align: center; font-size: 20px">
+            <a asp-controller="Home" asp-action="MoveUpOneFolder" asp-route-currentId="@currId">&#8593</a>
+        </div>
+        <div class="col-4">
+            <form asp-area="FileExplorerUser" asp-controller="Home" asp-action="FolderAdder">
+                <input type="number" name="papaFolderId" value="@currId" hidden/>
+                <button type="submit" class="btn btn-primary" style="width: 100%">Dodaj nowy Folder</button>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="card-header row" style="margin-left: 0">
+    <div class="col-4">
+        Folder Name
+    </div>
+    <div class="col-3">
+        Creation Date
+    </div>
+    <div class="col-3">
+        Accessibility
+    </div>
+    <div class="col-1">
+        
+    </div>
+    <div class="col-1">
+        <a asp-area="FileExplorerUser" asp-controller="Home" asp-action="ShowPath" 
+           asp-route-currentId="@Model.TheFolders.CurrParentFolder">P</a>
+    </div>
+</div>
+<div class="card-body" style="margin-left: 0; margin-right: 0">
+    @foreach (var seenFolder in Model.TheFolders.GivenFolderList) {
+        <div class="row mt-2">
+            <div class="col-4">
+                @if (seenFolder.OptionalPassword != null) {
+                    <a data-toggle="modal" data-target="#passwordUserModal">@seenFolder.FolderName</a>
+                    <div class="modal fade" id="passwordUserModal" tabindex="-1" role="dialog"
+                         aria-labelledby="passwordUserModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="passwordUserModalLabel">Password required</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <form asp-area="FileExplorerUser" asp-controller="Home" asp-action="MoveDownToFolder">
+                                    <div class="modal-body">
+                                        <p>Oops! To access this folder, you need to input a password!</p>
+                                        <input type="text" name="givenPassword" required/>
+                                        <input type="number" name="currentId" hidden value="@seenFolder.Id"/> 
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                        <button type="button" class="btn btn-dark" data-dismiss="modal">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (seenFolder.OptionalPassword == null) {
+                    <a asp-area="FileExplorerUser" asp-controller="Home" asp-action="Index"
+                       asp-route-currId="@seenFolder.Id"> @seenFolder.FolderName </a>
+                }
+            </div>
+            <div class="col-3">
+                @seenFolder.DateCreated
+            </div>
+            <div class="col-3">
+                @seenFolder.Accessibility
+            </div>
+            <div class="col-1">
+                
+            </div>
+            <div class="col-1">
+                
+            </div>
+            
+        </div>
+    }
+</div>
+<div class="card-header" style="text-align: center">Files in current Folder</div>
+<div class="card-body" style="margin-left: 0; margin-right: 0">
+
+    @foreach (var seenFile in Model.TheFiles) {
+        <div class="row mt-2">
+            <div class="col-6">
+                @seenFile.Name
+            </div>
+            <div class="col-3">
+                @Html.ActionLink("Download", "DownloadFile", new {fileName = seenFile.Name})
+            </div>
+            <div class="col-3">
+                <a asp-area="FileExplorerUser" asp-controller="Home" asp-action="DelteFile"
+                   asp-route-deltedId="@seenFile.Id" asp-route-fatherId="@seenFile.FatherId">Delete</a>
+            </div>
+        </div>
+    }
+    <form class="mt-2" method="post" enctype="multipart/form-data" asp-area="FileExplorerUser" asp-controller="Home" asp-action="Upload">
+        <div style="text-align: center; min-width: 50%">
+            <div class="drag-area">
+                <div class="icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <input type="number" id="fatherNumber" hidden value="@currId" name="fatherId"/>
+                <header>Drag & Drop to Upload File</header>
+                <p>OR</p>
+                <button type="button">Browse File</button><br>
+                <img src="//:0" alt="" id="fileShower">
+                <input id="fileInput" type="file" name="fileInput" hidden/> <br>
+                <button type="button" id="getMeThisFile" class="btn btn-primary mt-1">Add this File</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+
+
+</script>

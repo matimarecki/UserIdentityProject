@@ -1,0 +1,30 @@
+@model UserIdentityProject.Areas.FileExplorerAdmin.Models.FolderModel
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<h2 style="text-align: center">Edit Folder Properties</h2>
+
+<div class="card-header" style="text-align: center">
+    <form asp-controller="Home" asp-action="Index">
+        <input type="number" name="currId" value="@Model.ParentId" hidden/>
+        <button type="submit" class="btn btn-dark ml-2">Cancel</button>
+    </form>
+</div>
+<div class="card-body">
+    <form method="post" asp-area="FileExplorerAdmin" asp-controller="Home" asp-action="EditFolder">
+        <input type="text" class="mt-2 mb-1" name="FolderName" value="@Model.FolderName" required/> <br>
+        <select name="Accessibility" class="mt-1 mb-2" required>
+            <option value="SuperAdmin"> SuperAdmin </option>
+            <option value="Admin"> Admin </option>
+            <option value="Moderator"> Moderator </option>
+            <option value="Basic"> Basic </option>
+        </select><br>
+        <input type="text" class="mt-2 mb-1" name="OptionalPassword" value="@Model.OptionalPassword"/> <br>
+        <input type="number" name="ParentId" hidden value="@Model.ParentId"/>
+        <input type="number" name="Id" hidden value="@Model.Id"/>
+        <button type="submit" class="btn btn-dark">Done</button>
+    </form>
+</div>

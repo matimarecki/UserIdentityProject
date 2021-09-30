@@ -1,0 +1,30 @@
+@model int
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<h2 style="text-align: center">Create Folder</h2>
+
+<div class="card-header" style="text-align: center">
+    <form asp-controller="Home" asp-action="Index">
+        <input type="number" name="currId" value="@Model" hidden/>
+        <button type="submit" class="btn btn-dark ml-2">Cancel</button>
+    </form>
+</div>
+
+<div class="card-body">
+    <form method="post" asp-area="FileExplorerAdmin" asp-controller="Home" asp-action="AddFolder">
+        <input type="text" class="mt-2 mb-1" name="folderName" required/> <br>
+        <select name="accessibility" class="mt-1 mb-2" required>
+            <option value="SuperAdmin"> SuperAdmin </option>
+            <option value="Admin"> Admin </option>
+            <option value="Moderator"> Moderator </option>
+            <option value="Basic"> Basic </option>
+        </select><br>
+        <input type="number" name="parentId" hidden value="@Model"/>
+        <input type="text" class="mt-2 mb-1" name="optionalPassword"/> <br>
+        <button type="submit" class="btn btn-dark">Done</button>
+    </form>
+</div>
